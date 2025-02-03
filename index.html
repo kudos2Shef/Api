@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title></title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- <link href="css/style.css" rel="stylesheet"> -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet">
+
+    </head>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
+        @import url('styles2.css');
+        
+    </style>
+    <body>
+        <nav class="navbar">
+        <i class="fa fa-sun-o" ></i>
+        <i class="fa fa-moon-o"  ></i>
+        </nav>
+        <div class="container">
+        </div>
+        <script >
+let select = document.createElement('select');
+select.setAttribute('id','field');
+
+let div = document.createElement('div');
+let btn = document.createElement('button');
+btn.innerText = 'Back';
+div.classList.add('drop');
+
+
+let contain = document.getElementsByClassName('container');
+let icon =document.getElementsByClassName('fa');
+let toggle = false,val=0,check,checkvalue;
+document.body.insertBefore(div,contain[0]);
+
+
+api()
+function api(){
+fetch('https://dummyjson.com/users').then((res)=>{
+   
+  return res.json()
+}).then((data)=>{
+    let aray =['firstName','lastName','age','gender','email','phone','birthDate','state','country','university','department'];
+    aray.sort();
+
+    let sel = aray.map((e)=>{
+                return `<option>${e.toUpperCase()}</option>`
+    })
+
+    sel.unshift(`<option hidden>Select</option>`);
+    select.innerHTML = sel.join("");
+    div.appendChild(select);
+    div.innerHTML+=`<input id='inp' type='text' placeholder=''></input> `
+
+
+
+let user = data.users
+let result = user.map((t)=>{
+ 
+
+    return `<div class='users'>
+            <div class='arrange'>
+            <h5>Name: ${t.firstName} ${t.lastName} </h5>
+            <img src=${t.image}>
+            </div>
+            <div class='arrange'>
+            <h5>Age: ${t.age}</h5>
+            <h5 class='caps'>Gender: ${t.gender}</h5>
+            </div >
+            
+            <h5>Email: ${t.email} </h5>
+            <h5>Phone: ${t.phone}</h5>
+            
+            <h5>BirthDate: ${t.birthDate}</h5>
+            <h5>Location: ${t.address.state} , ${t.address.country}</h5>
+            <h5>University: ${t.university} </h5>
+            <h5>Company: ${t.company.department} </h5>
+
+
+            </div>`
+
+
+})
+
+contain[0].innerHTML = result.join(""); 
+let field = document.getElementById('field');
+let inp = document.getElementById('inp');
+field.addEventListener('change',()=>{
+
+       inp.setAttribute('placeholder',field.value);
+       check = field.value;
+       
+
+
+
+})
+inp.addEventListener('change',()=>{
+    div.appendChild(btn);
+    btn.style.display = 'block';
+    checkvalue = inp.value ;
+
+if(isNaN(inp.value)){
+    checkvalue = inp.value;
+
+}      
+else{
+    checkvalue = parseInt(inp.value);
+}  
+        let display = user.map((t)=>{
+ 
+    switch(typeof(checkvalue)){
+        case "string":
+            if(check == 'GENDER'|| check =='EMAIL'){
+                checkvalue = checkvalue.toLowerCase();
+
+            }
+           
+            else {
+            checkvalue = checkvalue.slice(0,1).toUpperCase().concat(checkvalue.slice(1));
+            }
+            break;
+        case "number":
+            checkvalue = parseInt(inp.value);
+            break;
+        default :
+            break;
+
+    }
+    let len = checkvalue.length
+
+    if(t.age==parseInt(checkvalue)||t.company.department.slice(0,len) ==checkvalue||
+    t.firstName.slice(0,len)== checkvalue||t.lastName.slice(0,len)== checkvalue|| 
+    t.gender.slice(0,len)== checkvalue|| t.email.slice(0,len)== checkvalue ||t.phone.slice(0,len) == checkvalue||
+    t.birthDate.slice(0,len) == checkvalue || t.address.state.slice(0,len) == checkvalue || t.address.country.slice(0,len)==checkvalue 
+    || t.university.slice(0,len) == checkvalue ){
+        inp.value = '';
+        return `<div class='users'>
+        <div class='arrange'>
+        <h5>Name: ${t.firstName} ${t.lastName} </h5>
+        <img src=${t.image}>
+        </div>
+        <div class='arrange'>
+        <h5>Age: ${t.age}</h5>
+        <h5 class='caps'>Gender: ${t.gender}</h5>
+        </div >
+        
+        <h5>Email: ${t.email} </h5>
+        <h5>Phone: ${t.phone}</h5>
+        
+        <h5>BirthDate: ${t.birthDate}</h5>
+        <h5>Location: ${t.address.state} , ${t.address.country}</h5>
+        <h5>University: ${t.university} </h5>
+        <h5>Company: ${t.company.department} </h5>
+
+
+        </div>`
+    }
+   
+   })
+   
+   contain[0].innerHTML = display.join('');
+
+if(toggle==true)
+    {setter();}
+
+   });
+
+   btn.addEventListener('click',()=>{
+    contain[0].innerHTML = result.join('');
+    btn.style.display='none'
+    inp.value='';
+    
+    if(toggle==true){
+        setter();
+    }
+        })
+
+   })
+
+
+}
+
+function setter(){
+    let z = document.querySelectorAll('div');
+    for(let i = 0;i<z[1].children.length;i++){
+        z[1].children[i].classList.remove('users');
+        z[1].children[i].classList.add('dark');
+        z[1].children[i].style.transition ='2s'
+
+        setTimeout(()=>{        
+            z[1].children[i].style.transition ='0.7s'
+
+        },2000)
+
+       }
+     }
+
+function byDefault(){
+    let z = document.querySelectorAll('div');
+    for(let i = 0;i<z[1].children.length;i++){
+        z[1].children[i].classList.remove('dark');
+
+        z[1].children[i].classList.add('users');
+        z[1].children[i].style.transition ='2s'
+
+        setTimeout(()=>{     
+            z[1].children[i].style.transition ='0.7s'
+   
+        },2000)
+
+        
+
+       }
+}
+
+icon[0].addEventListener('click',()=>{
+     if(toggle == false){
+        toggle = true;
+        icon[1].style.color='white'
+        icon[1].style.display = 'block'
+        icon[0].style.display = 'none'
+
+        document.body.style.backgroundColor ='rgb(22, 6, 40)';//'rgb(0, 11, 88)';
+        document.body.style.transition='3s';
+      
+
+        setter();
+        
+    }
+})
+
+icon[1].addEventListener('click',()=>{
+    if(toggle == true){
+    toggle = false;
+    icon[1].style.display = 'none'
+    icon[0].style.display = 'block'
+    document.body.style.backgroundColor = 'rgb(211, 222, 220)';
+    document.body.style.transition='3s';
+    
+    
+   byDefault();
+}
+})
+        </script>
+    </body>
+</html>
+
